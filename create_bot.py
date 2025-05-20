@@ -14,3 +14,9 @@ logger = logging.getLogger(__name__)
 
 bot = Bot(token=os.getenv('BOT_TOKEN'), default=DefaultBotProperties(parse_mode=ParseMode.HTML))
 dp = Dispatcher(storage=MemoryStorage())
+
+#формула расчета процента выполнения и индикатор
+def progress_bar(percentage):
+    filled = '█' * int(percentage / 10)
+    empty = '░' * (10 - len(filled))
+    return f"{filled}{empty} {percentage:.1f}%"
