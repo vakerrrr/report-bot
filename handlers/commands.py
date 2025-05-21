@@ -1,11 +1,12 @@
 from aiogram import Router, F, types
 from aiogram.filters import Command
 from aiogram.types import (Message,
-                           ReplyKeyboardRemove)
+                           ReplyKeyboardRemove,
+                           KeyboardButton)
 from keyboards.all_kb import points_kb
-import text
-from states import ReportStates
-from text import POINT_PLANS, user_report
+from classes import text
+from classes.states import ReportStates
+from classes.text import POINT_PLANS, user_report
 from aiogram.fsm.context import FSMContext
 
 router = Router()
@@ -75,3 +76,13 @@ async def process_credit(message: Message, state: FSMContext):
 async def process_double(message: Message, state: FSMContext):
     double_sold = int(message.text)
     user_report[message.from_user.id]['double_sold'] = double_sold
+    await state.set_state(ReportStates.confirmation)
+    await message.answer('✅<b>Отлично, отчёт готов!</b>\n\n'
+                         '📋<b>Теперь введите комментарий с причинами невыполнения ежедневных планов по направлениям.</b>\n\n'
+                         '<b>Или нажмите <u>пропустить.</b></u>', reply_markup=types.ReplyKeyboardMarkup(keyboard=[[KeyboardButton(text='Пропустить')]], resize_keyboard=True))
+
+@router.message(ReportStates.confirmation)
+async def confirm(message: Message, state: FSMContext):
+    if message.text.lower() != 'Пропустить':
+        user_report[message.from_user.id]['comment'] = message.text
+    report = format_report(user_report[message.from_user.id])

@@ -1,5 +1,5 @@
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
-from text import POINT_PLANS
+from aiogram.types import KeyboardButton
+from classes.text import POINT_PLANS
 from aiogram.utils.keyboard import ReplyKeyboardBuilder
 
 def points_kb():
