@@ -3,7 +3,7 @@ from aiogram.filters import Command
 from aiogram.types import (Message,
                            ReplyKeyboardRemove,
                            KeyboardButton)
-from keyboards.all_kb import points_kb
+from keyboards.all_kb import points_kb, easter
 from classes import text
 from classes.states import ReportStates
 from classes.text import POINT_PLANS, user_report
@@ -12,6 +12,11 @@ from functions.func import format_report
 from create_bot import bot, admin
 
 router = Router()
+
+@router.message(F.text == 'Кто твой создатель?')
+async def easter_text(message: Message):
+    await message.answer('Мой создатель Родников Владислав.\n Самый харизматичный, трудолюбивый, крутой и скромный парень.', reply_markup=easter())
+
 
 @router.message(Command('start'))
 async def cmd_start(message: Message):
