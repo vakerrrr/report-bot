@@ -8,6 +8,8 @@ from classes import text
 from classes.states import ReportStates
 from classes.text import POINT_PLANS, user_report
 from aiogram.fsm.context import FSMContext
+from functions.func import format_report
+from create_bot import bot, admin
 
 router = Router()
 
@@ -77,12 +79,16 @@ async def process_double(message: Message, state: FSMContext):
     double_sold = int(message.text)
     user_report[message.from_user.id]['double_sold'] = double_sold
     await state.set_state(ReportStates.confirmation)
-    await message.answer('✅<b>Отлично, отчёт готов!</b>\n\n'
-                         '📋<b>Теперь введите комментарий с причинами невыполнения ежедневных планов по направлениям.</b>\n\n'
-                         '<b>Или нажмите <u>пропустить.</b></u>', reply_markup=types.ReplyKeyboardMarkup(keyboard=[[KeyboardButton(text='Пропустить')]], resize_keyboard=True))
+    await message.answer('✅Отлично, отчёт готов!\n\n'
+                         '📋Теперь введите комментарий с причинами невыполнения ежедневных планов по направлениям.\n\n'
+                         'Или нажмите пропустить.', reply_markup=types.ReplyKeyboardMarkup(keyboard=[[KeyboardButton(text='Пропустить')]], resize_keyboard=True))
 
 @router.message(ReportStates.confirmation)
 async def confirm(message: Message, state: FSMContext):
     if message.text.lower() != 'Пропустить':
         user_report[message.from_user.id]['comment'] = message.text
     report = format_report(user_report[message.from_user.id])
+    await bot.send_message(admin, report, parse_mode='HTML')
+    await message.answer('✅Отчёт отправлен!')
+    await message.answer(f'{report}', parse_mode='HTML', reply_markup=ReplyKeyboardRemove())
+    await state.clear()
