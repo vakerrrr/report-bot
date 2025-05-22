@@ -1,9 +1,39 @@
+from create_bot import bot, scheduler, TIMEZONE
+
+#напоминалка на написание отчета
+async def send_remind():
+    message = ('<b>⏰Напоминание!</b>\n\n'
+               '<b>Не забудьте отправить ежедневный отчёт.</b>\n'
+               '<b>Используйте команду /report</b>')
+
+    #заменить на бд
+    work_id = [00000000]
+
+    for chat_id in work_id:
+        try:
+            await bot.send_message(chat_id, message)
+        except Exception as e:
+            print(f'Не удалось отправить напоминание{chat_id}: {e}')
+
+#настройка напоминалки
+async def schedule_remind():
+    scheduler.add_job(
+        send_remind,
+        'cron',
+        hour=20,
+        minute=0,
+        timezone = TIMEZONE
+    )
+    scheduler.start()
+
+
 #формула расчета процента выполнения и индикатор
 def progress_bar(percentage):
     filled = '█' * int(percentage / 10)
     empty = '░' * (10 - len(filled))
     return f"{filled}{empty} {percentage:.1f}%"
 
+#создание отчета
 def format_report(data):
     point = data['point']
     pd = data['point_data']
